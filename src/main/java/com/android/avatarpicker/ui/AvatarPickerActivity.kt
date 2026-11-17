@@ -59,6 +59,15 @@ class AvatarPickerActivity : ComponentActivity() {
         }
         val itemViewComposer = (application as AvatarProviderApp).getItemViewComposer()
 
+        // The result handler lives as long as the app's process and is shared by all pickers.
+        // If an earlier picker is still waiting for the camera or the photo picker (like when
+        // the camera was moved into a floating window and back), a new picker would show its
+        // loading indicator and never clear it.
+        if (savedInstanceState == null
+                && activityViewModel.resultHandler.uiState.value is UiState.Loading) {
+            activityViewModel.resultHandler.unselect()
+        }
+
         setContent {
             AvatarPickerTheme {
                 val windowSize = calculateWindowSizeClass(this)
